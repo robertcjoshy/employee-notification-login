@@ -21,7 +21,7 @@ func Loginpost(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
-	if valid := Authenticated(username, password); valid {
+	if _, err := model.Authenticate(username, c); err == nil {
 		c.SetCookie("loggedin", "true", 3600, "", "", false, true)
 		//c.HTML(http.StatusOK, "secret.html", gin.H{})
 		c.Redirect(http.StatusFound, "/secret")
