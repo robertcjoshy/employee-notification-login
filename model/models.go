@@ -1,6 +1,11 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -11,4 +16,14 @@ type User struct {
 func (user *User) Save() error {
 	err := Database.Model(&user).Create(&user).Error
 	return err
+}
+
+func Authenticate(user string, c *gin.Context) (User, error) {
+	var input User
+	err := Database.Where("id = ?", user).First(&input).Error
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid useranme"})
+		c.Abort()
+	}
+	return input, nil
 }
